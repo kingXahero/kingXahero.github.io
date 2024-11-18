@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Calls Example</title>
+</head>
+<body>
+    <h1>API Calls by Xahero</h1>
+    <div id="content"></div>
+    <script>
+        // First API call to get your public IP address
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json()) // Convert response to JSON
+            .then(data => {
+                const ip = data.ip;
+                console.log('Public IP Address:', ip);
+
+                // Display IP Address
+                document.getElementById('content').innerHTML += `<p>Your public IP address is: ${ip}</p>`;
+
+                // Second API call to get location using IP address
+                return fetch(`https://ipwho.is/${ip}`);
+            })
+            .then(response => response.json()) // Convert response to JSON
+            .then(locationData => {
+                const location = `${locationData.city}, ${locationData.region_name}, ${locationData.country_name}`;
+                console.log('Location Data:', locationData);
+
+                // Display Location
+                document.getElementById('content').innerHTML += `<p>Your location is: ${location}</p>`;
+
+                // Third API call to get weather using coordinates
+                const apiKey = '062d6b51e1772d53d9d4ddabfb112baa'; // Replace with your OpenWeather API key
+                const lat = locationData.latitude;
+                const lon = locationData.longitude;
+                console.log('Coordinates:', { lat, lon });
+                return fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
+            })
+            .then(response => response.json()) // Convert response to JSON
+            .then(weatherData => {
+                const weatherDescription = weatherData.weather[0].description;
+                const temperature = weatherData.main.temp;
+                console.log('Weather Data:', weatherData);
+
+                // Display Weather Information
+                document.getElementById('content').innerHTML += `<p>The weather at your location is: ${weatherDescription} with a temperature of ${temperature}°C</p>`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('content').innerHTML += `<p>An error occurred: ${error.message}</p>`;
+            }); // Handle any errors
+    </script>
+</body>
+</html>
